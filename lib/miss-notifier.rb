@@ -1,1 +1,1 @@
-require_relative 'miss/notifier'
+require_relative "miss/notifier"
