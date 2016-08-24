@@ -1,8 +1,8 @@
 require 'spec_helper'
+require "miss/notifier/messenger"
+require "miss/notifier/messenger/clients/test"
 
 RSpec.describe Miss::Notifier::Messenger do
-
-  require "miss/notifier/messenger/clients/test"
 
   class FakeMessengerUser < Struct.new(:name, :cellphone); end
 

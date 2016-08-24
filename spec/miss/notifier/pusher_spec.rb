@@ -1,8 +1,8 @@
 require 'spec_helper'
+require "miss/notifier/pusher"
+require "miss/notifier/pusher/clients/test"
 
 RSpec.describe Miss::Notifier::Pusher do
-
-  require "miss/notifier/pusher/clients/test"
 
   class FakePusherUser < Struct.new(:name, :device_id); end
 
