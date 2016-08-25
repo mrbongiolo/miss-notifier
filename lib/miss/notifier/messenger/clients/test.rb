@@ -1,28 +1,29 @@
 module Miss
   module Notifier
     module Messenger
-      module Clients
+      class Clients
 
         class Test
-
-          def initialize(from:, to:, body:, opts: {})
-            @from = from
-            @to = to
-            @body = body
-            @opts = opts
-          end
 
           def self.deliveries
             @deliveries ||= []
           end
 
-          def deliver
-            self.class.deliveries << { from: @from,
-                                       to: @to,
-                                       body: @body,
-                                       opts: @opts }
+          def deliveries
+            self.class.deliveries
+          end
+
+          def call(from:, to:, body:, opts: {})
+            deliveries << {
+              from: from,
+              to: to,
+              body: body,
+              opts: opts
+            }
           end
         end
+
+        register :test, Test.new
       end
     end
   end

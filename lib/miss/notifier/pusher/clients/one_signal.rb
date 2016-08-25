@@ -3,24 +3,26 @@ require 'one_signal'
 module Miss
   module Notifier
     module Pusher
-      module Clients
+      class Clients
 
         class OneSignal
 
-          def initialize(to:, body:, extras: {}, opts: {})
+          def call(to:, body:, extras: {}, opts: {})
             @to = to
             @body = body
             @extras = extras
             @opts = opts
             @api_key = opts[:api_key]
+
+            deliver
           end
+
+          private
 
           def deliver
             ::OneSignal::Notification
               .create(params: build_params, opts: { api_key: @api_key })
           end
-
-          private
 
           def build_params
             {
@@ -30,6 +32,8 @@ module Miss
             }.reverse_merge(@extras)
           end
         end
+
+        register :one_signal, OneSignal.new
       end
     end
   end

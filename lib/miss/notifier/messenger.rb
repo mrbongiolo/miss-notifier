@@ -1,5 +1,5 @@
 require "miss/notifier"
-require "hanami/utils/string"
+require "miss/notifier/messenger/clients"
 
 module Miss
   module Notifier
@@ -22,17 +22,22 @@ module Miss
       end
 
       def self.deliveries
-        Clients::Test.deliveries
+        Clients[:test].deliveries
       end
 
-      def initialize(locals = {})
-        @locals = locals
-        @delivery_method = self.class.config.messenger.delivery_method
-        @delivery_client = delivery_client_class.new(
+      def deliver
+        delivery_client.call(
           from: __dsl(:from),
           to: __dsl(:to),
           body: __dsl(:body),
-          opts: extract_delivery_method_options(*@delivery_method))
+          opts: delivery_method_options
+        )
+      end
+
+      private
+
+      def clients_container
+        Miss::Notifier::Messenger::Clients
       end
     end
   end

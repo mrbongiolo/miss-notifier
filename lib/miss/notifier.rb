@@ -1,5 +1,5 @@
 require "miss/notifier/version"
-require "dry/configurable"
+require "dry-configurable"
 
 module Miss
   module Notifier
@@ -17,12 +17,12 @@ module Miss
 
     module ClassMethods
 
-      def deliver(locals={})
-        new( check_locals!(locals) ).deliver
-      end
-
       def config
         Miss::Notifier.config
+      end
+
+      def deliver(locals={})
+        new( check_locals!(locals) ).deliver
       end
 
       def required_locals(*value)
@@ -48,8 +48,15 @@ module Miss
 
     module SharedMethods
 
-      def deliver
-        @delivery_client.deliver
+      attr_reader :delivery_method_name,
+        :delivery_method_options,
+        :delivery_client
+
+      def initialize(locals = {})
+        @locals = locals
+        @delivery_method_name, @delivery_method_options = \
+          parse_delivery_method(*self.class.config.pusher.delivery_method)
+        @delivery_client = clients_container[delivery_method_name]
       end
 
       protected
@@ -69,18 +76,12 @@ module Miss
         end
       end
 
-      def delivery_client_class
-        @delivery_client_class ||= get_delivery_client_class(*@delivery_method)
+      def parse_delivery_method(name, **options)
+        [name, options]
       end
 
-      def get_delivery_client_class(client_name, **_)
-        Kernel.const_get(
-          "#{self.class.ancestors[1]}::Clients::#{ Hanami::Utils::String.new(client_name).classify }"
-        )
-      end
-
-      def extract_delivery_method_options(client_name, **opts)
-        opts
+      def clients_container
+        raise :not_declared, "This need to be declared."
       end
     end
 
